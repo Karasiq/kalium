@@ -27,13 +27,7 @@ public class NaCl {
 
     public static Sodium sodium() {
         Sodium sodium = SingletonHolder.SODIUM_INSTANCE;
-
-        if (!(sodium.sodium_version_string().compareTo("1.0.0") >= 0)) {
-            String message = String.format(
-                    "Unsupported libsodium version: %s. Please update",
-                    sodium.sodium_version_string());
-            throw new UnsupportedOperationException(message);
-        }
+        checkVersion(sodium);
         return sodium;
     }
 
@@ -47,6 +41,26 @@ public class NaCl {
                         .search("lib")
                         .load(LIBRARY_NAME);
 
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static final Integer[] MIN_SUPPORTED_VERSION = new Integer[] { 1, 0, 4 };
+
+    private static boolean versionSupported = false;
+
+    private static void checkVersion(Sodium lib) {
+        if (!versionSupported) {
+            String[] version = lib.sodium_version_string().split("\\.");
+            versionSupported = version.length >= 3 &&
+                MIN_SUPPORTED_VERSION[0] <= new Integer(version[0]) &&
+                MIN_SUPPORTED_VERSION[1] <= new Integer(version[1]) &&
+                MIN_SUPPORTED_VERSION[2] <= new Integer(version[2]);
+        }
+        if (!versionSupported) {
+            String message = String.format("Unsupported libsodium version: %s. Please update",
+                                        lib.sodium_version_string());
+            throw new UnsupportedOperationException(message);
+        }
     }
 
     private NaCl() {
