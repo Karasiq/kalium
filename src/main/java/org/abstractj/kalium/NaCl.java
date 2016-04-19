@@ -20,15 +20,17 @@ import jnr.ffi.LibraryLoader;
 import jnr.ffi.annotations.In;
 import jnr.ffi.annotations.Out;
 import jnr.ffi.byref.LongLongByReference;
-import jnr.ffi.types.u_int64_t;
 import jnr.ffi.types.size_t;
+import jnr.ffi.types.u_int64_t;
+
+import java.nio.ByteBuffer;
 
 public class NaCl {
 
     public static Sodium sodium() {
         Sodium sodium = SingletonHolder.SODIUM_INSTANCE;
 
-        if (!(sodium.sodium_version_string().compareTo("1.0.4") >= 0)) {
+        if (!(sodium.sodium_version_string().compareTo("1.0.10") >= 0)) {
             String message = String.format(
                     "Unsupported libsodium version: %s. Please update",
                     sodium.sodium_version_string());
@@ -68,6 +70,9 @@ public class NaCl {
         // Generating Random Data
 
         void randombytes(@Out byte[] buffer, @In @u_int64_t int size);
+
+        void randombytes(@Out ByteBuffer bytes,
+                         @In @u_int64_t int byteLen);
 
         // ---------------------------------------------------------------------
         // Secret-key cryptography: Authenticated encryption
@@ -131,17 +136,35 @@ public class NaCl {
                 @Out byte[] ct, @In byte[] msg, @In @u_int64_t int length,
                 @In byte[] nonce, @In byte[] key);
 
+        int crypto_secretbox_easy(
+                @Out ByteBuffer ct, @In ByteBuffer msg, @In @u_int64_t int length,
+                @In ByteBuffer nonce, @In ByteBuffer key);
+
         int crypto_secretbox_open_easy(
                 @Out byte[] message, @In byte[] ct, @In @u_int64_t int length,
                 @In byte[] nonce, @In byte[] key);
+
+        int crypto_secretbox_open_easy(
+                @Out ByteBuffer message, @In ByteBuffer ct, @In @u_int64_t int length,
+                @In ByteBuffer nonce, @In ByteBuffer key);
 
         int crypto_secretbox_detached(
                 @Out byte[] ct, @Out byte[] mac, @In byte[] msg,
                 @In @u_int64_t int length, @In byte[] nonce, @In byte[] key);
 
+        int crypto_secretbox_detached(
+                @Out ByteBuffer ct, @Out ByteBuffer mac, @In ByteBuffer msg,
+                @In @u_int64_t int length, @In ByteBuffer nonce,
+                @In ByteBuffer key);
+
         int crypto_secretbox_open_detached(
                 @Out byte[] message, @In byte[] ct, @In byte[] mac,
                 @In @u_int64_t int length, @In byte[] nonce, @In byte[] key);
+
+        int crypto_secretbox_open_detached(
+                @Out ByteBuffer message, @In ByteBuffer ct, @In ByteBuffer mac,
+                @In @u_int64_t int length, @In ByteBuffer nonce,
+                @In ByteBuffer key);
 
         // ---------------------------------------------------------------------
         // Secret-key cryptography: Authentication
@@ -271,12 +294,19 @@ public class NaCl {
         int crypto_box_keypair(
                 @Out byte[] publicKey, @Out byte[] secretKey);
 
+        int crypto_box_keypair(
+                @Out ByteBuffer publicKey, @Out ByteBuffer secretKey);
+
         int crypto_box_seed_keypair(
                 @Out byte[] publicKey, @Out byte[] secretKey, @In byte[] seed);
 
         int crypto_box_beforenm(
                 @Out byte[] sharedkey, @In byte[] publicKey,
                 @In byte[] privateKey);
+
+        int crypto_box_beforenm(
+                @Out ByteBuffer sharedkey, @In ByteBuffer publicKey,
+                @In ByteBuffer privateKey);
 
         /**
          * @deprecated This is the original NaCl interface and not recommended
@@ -300,9 +330,17 @@ public class NaCl {
                 @Out byte[] ct, @In byte[] msg, @In @u_int64_t int length,
                 @In byte[] nonce, @In byte[] shared);
 
+        int crypto_box_easy_afternm(
+                @Out ByteBuffer ct, @In ByteBuffer msg, @In @u_int64_t int length,
+                @In ByteBuffer nonce, @In ByteBuffer shared);
+
         int crypto_box_detached_afternm(
                 @Out byte[] ct, @Out byte[] mac, @In byte[] message,
                 @In @u_int64_t int length, @In byte[] nonce, @In byte[] key);
+
+        int crypto_box_detached_afternm(
+                @Out ByteBuffer ct, @Out ByteBuffer mac, @In ByteBuffer message,
+                @In @u_int64_t int length, @In ByteBuffer nonce, @In ByteBuffer key);
 
         /**
          * @deprecated This is the original NaCl interface and not recommended
@@ -326,9 +364,17 @@ public class NaCl {
                 @Out byte[] message, @In byte[] ct, @In @u_int64_t int length,
                 @In byte[] nonce, @In byte[] shared);
 
+        int crypto_box_open_easy_afternm(
+                @Out ByteBuffer message, @In ByteBuffer ct, @In @u_int64_t int length,
+                @In ByteBuffer nonce, @In ByteBuffer shared);
+
         int crypto_box_open_detached_afternm(
                 @Out byte[] message, @In byte[] ct, @In byte[] mac,
                 @In @u_int64_t int length, @In byte[] nonce, @In byte[] key);
+
+        int crypto_box_open_detached_afternm(
+                @Out ByteBuffer message, @In ByteBuffer ct, @In ByteBuffer mac,
+                @In @u_int64_t int length, @In ByteBuffer nonce, @In ByteBuffer key);
 
         // ---------------------------------------------------------------------
         // Public-key cryptography: Public-key signatures
@@ -422,9 +468,17 @@ public class NaCl {
                 @Out byte[] ct, @In byte[] message, @In @u_int64_t int length,
                 @In byte[] publicKey);
 
+        int crypto_box_seal(
+                @Out ByteBuffer ct, @In ByteBuffer message, @In @u_int64_t int length,
+                @In ByteBuffer publicKey);
+
         int crypto_box_seal_open(
                 @Out byte[] message, @In byte[] c, @In @u_int64_t int length,
                 @In byte[] publicKey, @In byte[] privateKey);
+
+        int crypto_box_seal_open(
+                @Out ByteBuffer message, @In ByteBuffer c, @In @u_int64_t int length,
+                @In ByteBuffer publicKey, @In ByteBuffer privateKey);
 
         // ---------------------------------------------------------------------
         // Hashing: Generic hashing

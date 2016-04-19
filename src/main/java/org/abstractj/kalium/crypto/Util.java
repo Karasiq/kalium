@@ -16,6 +16,9 @@
 
 package org.abstractj.kalium.crypto;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 public class Util {
@@ -37,6 +40,27 @@ public class Util {
             throw new RuntimeException("Invalid size");
     }
 
+    public static void checkLength(Buffer buffer, int size, String what) {
+        if (buffer == null)
+            throw new NullPointerException(
+                    what + " cannot be null");
+
+        if (buffer.limit() != size)
+            throw new IllegalArgumentException(
+                    what + " expected length = " + size +
+                            ", actual length = " + buffer.limit());
+    }
+
+    public static void checkLengthIsGreaterThan(Buffer buffer, int size, String what) {
+        if (buffer == null)
+            throw new NullPointerException(
+                    what + " cannot be null");
+
+        if (buffer.limit() <=  size)
+            throw new IllegalArgumentException(
+                    what + " must be greater than " + size + " bytes in length");
+    }
+
     public static byte[] zeros(int n) {
         return new byte[n];
     }
@@ -44,6 +68,12 @@ public class Util {
     public static boolean isValid(int status, String message) {
         if (status != 0)
             throw new RuntimeException(message);
+        return true;
+    }
+
+    public static boolean isValid(int status) {
+        if (status != 0)
+            throw new RuntimeException("Unexpected return code");
         return true;
     }
 
@@ -56,5 +86,13 @@ public class Util {
         System.arraycopy(signature, 0, result, 0, signature.length);
         System.arraycopy(message, 0, result, signature.length, message.length);
         return result;
+    }
+
+    public static void zeroBuffer(final ByteBuffer buffer) {
+        if(buffer.isReadOnly() || buffer instanceof MappedByteBuffer)
+            return; // Better to raise exception?
+
+        buffer.rewind();
+        buffer.put(new byte[buffer.capacity()]);
     }
 }
