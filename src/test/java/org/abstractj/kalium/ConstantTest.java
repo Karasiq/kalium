@@ -13,7 +13,7 @@ public class ConstantTest {
                     .search("/usr/local/lib")
                     .search("/opt/local/lib")
                     .search("lib")
-                    .load("sodium");
+                    .load(NaCl.LIBRARY_NAME);
 
     @Test
     public void testSecretBoxConstants() throws Exception {

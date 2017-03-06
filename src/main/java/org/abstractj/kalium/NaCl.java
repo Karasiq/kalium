@@ -24,6 +24,7 @@ import jnr.ffi.byref.LongLongByReference;
 import jnr.ffi.types.u_int64_t;
 import jnr.ffi.types.size_t;
 
+@SuppressWarnings("WeakerAccess")
 public class NaCl {
 
     public static Sodium sodium() {
@@ -32,7 +33,7 @@ public class NaCl {
         return sodium;
     }
 
-    private static final String LIBRARY_NAME = libraryName();
+    public static final String LIBRARY_NAME = libraryName();
 
     private static String libraryName() {
         switch (Platform.getNativePlatform().getOS()) {
@@ -53,7 +54,6 @@ public class NaCl {
 
     }
 
-    @SuppressWarnings("WeakerAccess")
     public static final Integer[] MIN_SUPPORTED_VERSION = new Integer[] { 1, 0, 4 };
 
     private static boolean versionSupported = false;
