@@ -852,7 +852,7 @@ public class NaCl {
 
         int CRYPTO_STREAM_KEYBYTES = 32;
 
-        int CRYPTO_STREAM_NONCEBYTES = 8;
+        int CRYPTO_STREAM_NONCEBYTES = 24;
 
         int crypto_stream(
                 @Out byte[] c, @In @u_int64_t int cLen, @In byte[] nonce,
